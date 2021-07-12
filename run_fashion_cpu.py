@@ -8,12 +8,14 @@ from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 import time
 
-import sys
-sys.path.append("code/python/")
+#import sys
+#sys.path.append("code/python/")
 
-from Utils import Scale, Clippy
+#from Utils import Scale, Clippy
 
-from QuantizedNN import QuantizedLinear, QuantizedConv2d, QuantizedActivation
+#from QuantizedNN import QuantizedLinear, QuantizedConv2d, QuantizedActivation
+from qnn.QuantizedNN import QuantizedLinear, QuantizedConv2d, QuantizedActivation
+from qnn.Utils import Scale, Clippy
 
 class Quantization:
     def __init__(self, method):
