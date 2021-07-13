@@ -14,14 +14,9 @@ import time
 #from Utils import Scale, Clippy
 
 #from QuantizedNN import QuantizedLinear, QuantizedConv2d, QuantizedActivation
-from qnn.QuantizedNN import QuantizedLinear, QuantizedConv2d, QuantizedActivation
+from qnn.QuantizedNN import Quantization, QuantizedLinear, QuantizedConv2d, QuantizedActivation
 from qnn.Utils import Scale, Clippy
 
-class Quantization:
-    def __init__(self, method):
-        self.method = method
-    def applyQuantization(self, input):
-        return self.method(input)
 
 def binarizePY(input):
     output = input.clone().detach()
@@ -35,7 +30,7 @@ binarizepm1 = Quantization(binarizePY)
 class BNN_MNIST(nn.Module):
     def __init__(self):
         super(BNN_MNIST, self).__init__()
-        self.htanh = nn.Hardtanh()
+        self.htanh = nn.Hardtanh() # max(-1, min(x, 1)) (piece-wise function)
         self.conv1 = QuantizedConv2d(1, 64, kernel_size=3, padding=1, stride=1, quantization=binarizepm1)
         self.bn1 = nn.BatchNorm2d(64)
         self.qact1 = QuantizedActivation(quantization=binarizepm1)
@@ -91,9 +86,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+            print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)}\
+                ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}")
             if args.dry_run:
                 break
 
@@ -113,9 +107,8 @@ def test(model, device, test_loader):
 
     test_loss /= len(test_loader.dataset)
 
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len(test_loader.dataset)}\
+         ({100. * correct / len(test_loader.dataset):.2f}%)\n')
 
 
 def main():
