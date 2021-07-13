@@ -11,13 +11,12 @@ class Quantization:
         self.method = method
     def applyQuantization(self, input):
         return self.method(input)
-        
+
 
 class Quantize(Function):
     @staticmethod
     def forward(ctx, input, quantization):
-        """[summary]
-
+        """perform quantization
         Args:
             ctx (any): ctx is a context object that can be used to stash information
              for backward computation.You can cache arbitrary and objects 
@@ -32,12 +31,14 @@ class Quantize(Function):
         """
 
         output = input.clone().detach()
+        # TODO: error handeling: if quantization is none
         output = quantization.applyQuantization(output)
         return output
 
     @staticmethod
     def backward(ctx, grad_output):
-        """gradient formula
+        """gradient formula 
+           currently the straight through estimator is used
 
         Args:
             ctx (any): ctx is a context object that can be used to access stashed information
@@ -64,7 +65,7 @@ class QuantizedActivation(nn.Module):
         super(QuantizedActivation, self).__init__(*args, **kwargs)
 
     def forward(self, input):
-        output = quantize(input, self.quantization)
+        output = quantize(input, self.quantization) 
         return output
 
 
