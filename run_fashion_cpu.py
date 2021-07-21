@@ -83,7 +83,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
         optimizer.step()
         if batch_idx % args.log_interval == 0:
             print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)}\
-                ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}")
+                ({100. * batch_idx} /{len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}")
             if args.dry_run:
                 break
 
